@@ -1,15 +1,19 @@
-logs_dir="/var/log"
-
 utilisateur="said"
 
-output_file="~/Job8:Backup/number_connection-$(date +'%d-%m-%Y-%H:%M').tar"
+fichier_logs="/var/log/lastlog"
 
-nombre_connexions=$(grep -c "$utilisateur" "$logs_dir/auth.log")
+nombre_connexions=$(grep "sshd.*Accepted.*$utilisateur" "$fichier_logs" | wc -l)
 
-echo "$nombre_connexions" > "$output_file"
+date_format=$(date +"%d-%m-%Y-%H:%M")
 
-tar -cvf "$output_file.tar" "$output_file"
+nom_fichier="number_connection-$date_format"
 
-mv "$output_file.tar" ~/Job8:Backup/
+echo "$nombre_connexions" > "$nom_fichier"
 
-echo "Le script a été exécuté à $(date +'%d-%m-%Y %H:%M') et le nombre de connexions de $utilisateur a été enregistré dans $output_file.tar."
+tar -cvf "$nom_fichier.tar" "$nom_fichier"
+
+mkdir -p ~/Job8:Backup
+mv "$nom_fichier.tar" ~/Job8:Backup/
+
+rm "$nom_fichier"
+
